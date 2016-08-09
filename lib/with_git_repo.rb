@@ -1,4 +1,5 @@
 require 'with_git_repo/version'
+require 'git'
 
 class WithGitRepo
   attr_reader :clone_url
