@@ -1,8 +1,6 @@
 # WithGitRepo
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/with_git_repo`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Perform some actions with a git repo and then commit and push the changes back.
 
 ## Installation
 
@@ -22,7 +20,18 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'with_git_repo'
+
+with_git_repo = WithGitRepo.new(
+  clone_url: 'https://username:access_token@github.com/everypolitician/with_git_repo',
+  user_name: 'Chris Mytton',
+  user_email: 'team@everypolitician.org'
+)
+with_git_repo.commit_changes_to_branch('example-branch-name', 'Adding greeting.txt') do
+  File.write('greeting.txt', 'Hello, world!')
+end
+```
 
 ## Development
 
@@ -32,10 +41,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/with_git_repo.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/everypolitician/with_git_repo.
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
