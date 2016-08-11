@@ -24,7 +24,7 @@ class WithGitRepo
   private
 
   def checkout_branch!(branch)
-    if git.branches["origin/#{branch}"]
+    if git.branches[branch] || git.branches["origin/#{branch}"]
       git.checkout(branch)
     else
       git.checkout(branch, new_branch: true)
