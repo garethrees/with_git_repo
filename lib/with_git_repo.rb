@@ -13,11 +13,7 @@ class WithGitRepo
   end
 
   def commit_changes_to_branch(branch, message)
-    if git.branches["origin/#{branch}"]
-      git.checkout(branch)
-    else
-      git.checkout(branch, new_branch: true)
-    end
+    checkout_branch!(branch)
     git.chdir { yield }
     git.add
     return unless git.status.changed.any? || git.status.added.any?
@@ -27,8 +23,8 @@ class WithGitRepo
 
   private
 
-  def checkout_branch(branch)
-    if git.branches["origin/#{branch}"]
+  def checkout_branch!(branch)
+    if git.branches[branch] || git.branches["origin/#{branch}"]
       git.checkout(branch)
     else
       git.checkout(branch, new_branch: true)
