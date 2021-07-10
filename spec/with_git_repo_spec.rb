@@ -144,5 +144,32 @@ describe WithGitRepo do
         assert_equal 'foo@example.com', git.gcommit('HEAD').author.email
       end
     end
+
+    context 'with an optional git object' do
+      let(:options) { default_options.merge(git: mock_git) }
+
+      let(:mock_git) do
+        git = MiniTest::Mock.new
+        git.expect(:checkout, true, ['master'])
+        branches = MiniTest::Mock.new
+        branches.expect(:[], [], ['master'])
+        git.expect(:branches, branches)
+        git.expect(:chdir, true)
+        git.expect(:add, true)
+        status_changed = MiniTest::Mock.new
+        status_changed.expect(:changed, [])
+        git.expect(:status, status_changed)
+        status_added = MiniTest::Mock.new
+        status_added.expect(:added, [true])
+        git.expect(:status, status_added)
+        git.expect(:commit, true, ['a commit message'])
+        git.expect(:push, true, ['origin', 'master'])
+        git
+      end
+
+      it 'uses the given git object' do
+        assert mock_git.verify
+      end
+    end
   end
 end

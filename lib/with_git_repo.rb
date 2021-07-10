@@ -13,6 +13,7 @@ class WithGitRepo
     @clone_url = options.fetch(:clone_url)
     @user_name = options.fetch(:user_name, DEFAULT_USER_NAME)
     @user_email = options.fetch(:user_email, DEFAULT_USER_EMAIL)
+    @git = options.fetch(:git, nil)
   end
 
   def commit_changes_to_branch(branch, message)
@@ -20,6 +21,12 @@ class WithGitRepo
     git.chdir { yield }
     git.add
     git.commit(message) && git.push('origin', branch) if committable?
+  end
+
+  protected
+
+  def git
+    @git ||= default_git
   end
 
   private
@@ -45,8 +52,8 @@ class WithGitRepo
     git.branches[branch] || git.branches["origin/#{branch}"]
   end
 
-  def git
-    @git ||= Git.clone(clone_url, '.', path: Dir.mktmpdir).tap do |g|
+  def default_git
+    Git.clone(clone_url, '.', path: Dir.mktmpdir).tap do |g|
       g.config('user.name', user_name)
       g.config('user.email', user_email)
     end
