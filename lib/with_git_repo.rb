@@ -32,13 +32,9 @@ class WithGitRepo
   end
 
   def git
-    @git ||= Git.clone(clone_url, '.', path: tmpdir).tap do |g|
+    @git ||= Git.clone(clone_url, '.', path: Dir.mktmpdir).tap do |g|
       g.config('user.name', user_name)
       g.config('user.email', user_email)
     end
-  end
-
-  def tmpdir
-    @tmpdir ||= Dir.mktmpdir
   end
 end
