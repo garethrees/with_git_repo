@@ -16,12 +16,14 @@ class WithGitRepo
     checkout(branch)
     git.chdir { yield }
     git.add
-    return unless git.status.changed.any? || git.status.added.any?
-    git.commit(message)
-    git.push('origin', branch)
+    git.commit(message) && git.push('origin', branch) if committable?
   end
 
   private
+
+  def committable?
+    git.status.changed.any? || git.status.added.any?
+  end
 
   def checkout(branch)
     return unless branch
