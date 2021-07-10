@@ -1,0 +1,10 @@
+# pack-refs with: peeled fully-peeled sorted 
+7c268c8b05520f92fdd053bbda02ed514a240a60 refs/heads/add-git-dependency
+92cfbc35ddfe677b96212fa8170e521280d3c91b refs/heads/fix-branch-checkout-error
+402fa870cb454a143782388ea83fddd2eae1849e refs/heads/master
+b5d42e49801bd56fdd3df233f986dfe0f5971b46 refs/tags/v0.1.0
+^c0fc17b4a022e7960aa349bac4d9f8ede9f9d794
+1fe01b5f222ad81f5816ad90c93787a1a021ab3d refs/tags/v0.2.0
+^9f899ce95d2b6fd66a65dad55d1125d4c97abfe1
+8259ed9bac07f5fc8c1eaebd49b82b8a11b07c4a refs/tags/v0.3.0
+^402fa870cb454a143782388ea83fddd2eae1849e
