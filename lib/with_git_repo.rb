@@ -2,14 +2,17 @@ require 'with_git_repo/version'
 require 'git'
 
 class WithGitRepo
+  DEFAULT_USER_NAME = 'with_git_repo'.freeze
+  DEFAULT_USER_EMAIL = 'with_git_repo@everypolitician.org'.freeze
+
   attr_reader :clone_url
   attr_reader :user_name
   attr_reader :user_email
 
   def initialize(options = {})
     @clone_url = options.fetch(:clone_url)
-    @user_name = options.fetch(:user_name, 'with_git_repo')
-    @user_email = options.fetch(:user_email, 'with_git_repo@everypolitician.org')
+    @user_name = options.fetch(:user_name, DEFAULT_USER_NAME)
+    @user_email = options.fetch(:user_email, DEFAULT_USER_EMAIL)
   end
 
   def commit_changes_to_branch(branch, message)
