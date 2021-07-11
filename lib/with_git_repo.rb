@@ -10,7 +10,7 @@ class WithGitRepo
   attr_reader :user_email
 
   def initialize(options = {})
-    @clone_url = options.fetch(:clone_url)
+    @clone_url = options.fetch(:clone_url, nil)
     @user_name = options.fetch(:user_name, DEFAULT_USER_NAME)
     @user_email = options.fetch(:user_email, DEFAULT_USER_EMAIL)
     @git = options.fetch(:git, nil)
@@ -53,9 +53,15 @@ class WithGitRepo
   end
 
   def default_git
-    Git.clone(clone_url, '.', path: Dir.mktmpdir).tap do |g|
+    Git.clone(clone_url!, '.', path: Dir.mktmpdir).tap do |g|
       g.config('user.name', user_name)
       g.config('user.email', user_email)
     end
+  end
+
+  def clone_url!
+    msg = 'Must provide a clone_url option if no git option is given'
+    raise ArgumentError, msg unless clone_url
+    clone_url
   end
 end
