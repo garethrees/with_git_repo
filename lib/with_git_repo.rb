@@ -5,6 +5,17 @@ class WithGitRepo
   DEFAULT_USER_NAME = 'with_git_repo'.freeze
   DEFAULT_USER_EMAIL = 'with_git_repo@everypolitician.org'.freeze
 
+  def self.with_cloned_repo(clone_url, options = {})
+    path = options.fetch(:path, Dir.mktmpdir)
+    new(git: configure_git!(Git.clone(clone_url, '.', path: path), options))
+  end
+
+  def self.configure_git!(git, options = {})
+    git.config('user.name', options.fetch(:user_name, DEFAULT_USER_NAME))
+    git.config('user.email', options.fetch(:user_email, DEFAULT_USER_EMAIL))
+    git
+  end
+
   attr_reader :clone_url
   attr_reader :user_name
   attr_reader :user_email

@@ -1,5 +1,66 @@
 require 'spec_helper'
 describe WithGitRepo do
+  describe '.with_cloned_repo' do
+    subject { WithGitRepo.with_cloned_repo(clone_url, options) }
+
+    let(:clone_url) { "file://#{@dir}/with_git_repo.git" }
+    let(:default_options) { {} }
+
+    around do |test|
+      with_tmpdir do |dir|
+        @dir = dir
+        test.call
+      end
+    end
+
+    context 'with the default options' do
+      let(:options) { default_options }
+
+      it 'initialises with the cloned repo' do
+        assert_equal clone_url, subject.send(:git).remotes.first.url
+      end
+
+      it 'clones the repo into a tmpdir' do
+        assert_match Regexp.new(Dir.tmpdir), subject.send(:git).dir.path
+      end
+
+      it 'sets the user.name to the default user name' do
+        name = WithGitRepo::DEFAULT_USER_NAME
+        assert_equal name, subject.send(:git).config['user.name']
+      end
+
+      it 'sets the user.email to the default user email' do
+        email = WithGitRepo::DEFAULT_USER_EMAIL
+        assert_equal email, subject.send(:git).config['user.email']
+      end
+    end
+
+    context 'with the user_name option' do
+      let(:options) { default_options.merge(user_name: 'foo') }
+
+      it 'sets the user.name to the given user name' do
+        assert_equal 'foo', subject.send(:git).config['user.name']
+      end
+    end
+
+    context 'with the user_email option' do
+      let(:options) { default_options.merge(user_email: 'foo@example.com') }
+
+      it 'sets the user.name to the given user name' do
+        assert_equal 'foo@example.com', subject.send(:git).config['user.email']
+      end
+    end
+
+    context 'with the path option' do
+      let(:options) { default_options.merge(path: Dir.mktmpdir('foo')) }
+
+      it 'clones the repo into the given path' do
+        regexp = Regexp.new("#{Dir.tmpdir}/foo")
+        assert_match regexp, subject.send(:git).dir.path
+      end
+    end
+  end
+
   describe '#user_name' do
     subject { with_git_repo.user_name }
 
