@@ -7,12 +7,12 @@ class WithGitRepo
 
   def self.with_cloned_repo(clone_url, options = {})
     path = options.fetch(:path, Dir.mktmpdir)
-    new(git: configure_git!(Git.clone(clone_url, '.', path: path), options))
+    new(configure_git!(Git.clone(clone_url, '.', path: path), options))
   end
 
   def self.with_working_copy(path, options = {})
     path ||= Dir.pwd
-    new(git: configure_git!(Git.open(path), options))
+    new(configure_git!(Git.open(path), options))
   end
 
   def self.configure_git!(git, options = {})
@@ -21,15 +21,8 @@ class WithGitRepo
     git
   end
 
-  attr_reader :clone_url
-  attr_reader :user_name
-  attr_reader :user_email
-
-  def initialize(options = {})
-    @clone_url = options.fetch(:clone_url, nil)
-    @user_name = options.fetch(:user_name, DEFAULT_USER_NAME)
-    @user_email = options.fetch(:user_email, DEFAULT_USER_EMAIL)
-    @git = options.fetch(:git, nil)
+  def initialize(git)
+    @git = git
   end
 
   def commit_changes_to_branch(branch, message)
@@ -47,9 +40,7 @@ class WithGitRepo
 
   protected
 
-  def git
-    @git ||= default_git
-  end
+  attr_reader :git
 
   private
 
@@ -72,18 +63,5 @@ class WithGitRepo
 
   def exists?(branch)
     git.branches[branch] || git.branches["origin/#{branch}"]
-  end
-
-  def default_git
-    Git.clone(clone_url!, '.', path: Dir.mktmpdir).tap do |g|
-      g.config('user.name', user_name)
-      g.config('user.email', user_email)
-    end
-  end
-
-  def clone_url!
-    msg = 'Must provide a clone_url option if no git option is given'
-    raise ArgumentError, msg unless clone_url
-    clone_url
   end
 end

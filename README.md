@@ -26,11 +26,12 @@ the changes:
 ```ruby
 require 'with_git_repo'
 
-with_git_repo = WithGitRepo.new(
-  clone_url: 'https://username:access_token@github.com/everypolitician/with_git_repo',
+with_git_repo = WithGitRepo.with_cloned_repo(
+  'https://username:access_token@github.com/everypolitician/with_git_repo',
   user_name: 'Chris Mytton',
   user_email: 'team@everypolitician.org'
 )
+
 with_git_repo.commit_changes_to_branch('example-branch-name', 'Adding greeting.txt') do
   File.write('greeting.txt', 'Hello, world!')
 end

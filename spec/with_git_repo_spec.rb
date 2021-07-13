@@ -124,54 +124,6 @@ describe WithGitRepo do
     end
   end
 
-  describe '#user_name' do
-    subject { with_git_repo.user_name }
-
-    let(:with_git_repo) { WithGitRepo.new(options) }
-
-    let(:default_options) { {} }
-
-    context 'with no user_name option supplied' do
-      let(:options) { default_options }
-
-      it 'uses the default user_name' do
-        assert_equal 'with_git_repo', subject
-      end
-    end
-
-    context 'with a user_name option supplied' do
-      let(:options) { default_options.merge(user_name: 'foo') }
-
-      it 'uses the given user_name' do
-        assert_equal 'foo', subject
-      end
-    end
-  end
-
-  describe '#user_email' do
-    subject { with_git_repo.user_email }
-
-    let(:with_git_repo) { WithGitRepo.new(options) }
-
-    let(:default_options) { {} }
-
-    context 'with no user_email option supplied' do
-      let(:options) { default_options }
-
-      it 'uses the default user_email' do
-        assert_equal 'with_git_repo@everypolitician.org', subject
-      end
-    end
-
-    context 'with a user_email option supplied' do
-      let(:options) { default_options.merge(user_email: 'foo@example.com') }
-
-      it 'uses the given user_email' do
-        assert_equal 'foo@example.com', subject
-      end
-    end
-  end
-
   describe '#commit_changes_to_branch' do
     subject do
       with_git_repo.commit_changes_to_branch(branch, msg) do
@@ -180,9 +132,12 @@ describe WithGitRepo do
     end
 
     let(:clone_url) { "file://#{@dir}/with_git_repo.git" }
-    let(:default_options) { { clone_url: clone_url } }
+    let(:default_options) { { } }
     let(:options) { default_options }
-    let(:with_git_repo) { WithGitRepo.new(options) }
+
+    let(:with_git_repo) do
+      WithGitRepo.with_cloned_repo(clone_url, options)
+    end
 
     let(:branch) { 'master' }
     let(:msg) { 'a commit message' }
@@ -265,44 +220,6 @@ describe WithGitRepo do
 
       it 'commits the changes with the optional user.email' do
         assert_equal 'foo@example.com', git.gcommit('HEAD').author.email
-      end
-    end
-
-    context 'without a clone_url or git option' do
-      it 'raises an argument error' do
-        e = assert_raises(ArgumentError) do
-          WithGitRepo.new.commit_changes_to_branch('null', 'null')
-        end
-
-        msg = 'Must provide a clone_url option if no git option is given'
-        assert_equal msg, e.message
-      end
-    end
-
-    context 'with an optional git object' do
-      let(:options) { default_options.merge(git: mock_git) }
-
-      let(:mock_git) do
-        git = MiniTest::Mock.new
-        git.expect(:checkout, true, ['master'])
-        branches = MiniTest::Mock.new
-        branches.expect(:[], [], ['master'])
-        git.expect(:branches, branches)
-        git.expect(:chdir, true)
-        git.expect(:add, true)
-        status_changed = MiniTest::Mock.new
-        status_changed.expect(:changed, [])
-        git.expect(:status, status_changed)
-        status_added = MiniTest::Mock.new
-        status_added.expect(:added, [true])
-        git.expect(:status, status_added)
-        git.expect(:commit, true, ['a commit message'])
-        git.expect(:push, true, ['origin', 'master'])
-        git
-      end
-
-      it 'uses the given git object' do
-        assert mock_git.verify
       end
     end
   end
