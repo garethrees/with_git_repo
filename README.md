@@ -20,6 +20,9 @@ Or install it yourself as:
 
 ## Usage
 
+Clone a remote repo, commit changes to a new or existing branch, and then push
+the changes:
+
 ```ruby
 require 'with_git_repo'
 
@@ -29,6 +32,22 @@ with_git_repo = WithGitRepo.new(
   user_email: 'team@everypolitician.org'
 )
 with_git_repo.commit_changes_to_branch('example-branch-name', 'Adding greeting.txt') do
+  File.write('greeting.txt', 'Hello, world!')
+end
+```
+
+Open a working copy and commit to it:
+
+```ruby
+require 'with_git_repo'
+
+with_git_repo = WithGitRepo.with_working_copy(
+  '/path/to/working/copy',
+  user_name: 'Chris Mytton',
+  user_email: 'team@everypolitician.org'
+)
+
+with_git_repo.commit_changes('Adding greeting.txt') do
   File.write('greeting.txt', 'Hello, world!')
 end
 ```

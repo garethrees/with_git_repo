@@ -39,6 +39,12 @@ class WithGitRepo
     git.commit(message) && git.push('origin', branch) if committable?
   end
 
+  def commit_changes(message)
+    git.chdir { yield }
+    git.add
+    git.commit(message) if committable?
+  end
+
   protected
 
   def git

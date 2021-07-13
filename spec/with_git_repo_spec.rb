@@ -306,4 +306,49 @@ describe WithGitRepo do
       end
     end
   end
+
+  describe '#commit_changes' do
+    subject do
+      with_git_repo.commit_changes(msg) do
+        block.call
+      end
+    end
+
+    let(:with_git_repo) { WithGitRepo.with_working_copy(working_copy_path) }
+    let(:msg) { 'a commit message' }
+
+    let(:working_copy_path) { Dir.mktmpdir('working-copy-') }
+
+    around do |test|
+      Dir.chdir(working_copy_path) do
+        Git.clone(test_repo_path, '.', path: working_copy_path)
+        test.call
+      end
+    end
+
+    before { subject }
+
+    let(:git) { Git.open(working_copy_path) }
+
+    context 'when there are changes' do
+      let(:block) { -> { File.write('greeting.txt', 'Hello, world!') } }
+
+      it 'the changed file has the correct contents' do
+        blob = git.gcommit('HEAD').gtree.blobs['greeting.txt']
+        assert_equal 'Hello, world!', blob.contents
+      end
+
+      it 'commits the changes with the given message' do
+        assert_equal 'a commit message', git.gcommit('HEAD').message
+      end
+    end
+
+    context 'when nothing changes' do
+      let(:block) { -> { nil } }
+
+      it 'nothing is committed' do
+        refute_equal 'a commit message', git.gcommit('HEAD').message
+      end
+    end
+  end
 end
