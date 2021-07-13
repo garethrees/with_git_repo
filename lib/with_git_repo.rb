@@ -10,6 +10,11 @@ class WithGitRepo
     new(git: configure_git!(Git.clone(clone_url, '.', path: path), options))
   end
 
+  def self.with_working_copy(path, options = {})
+    path ||= Dir.pwd
+    new(git: configure_git!(Git.open(path), options))
+  end
+
   def self.configure_git!(git, options = {})
     git.config('user.name', options.fetch(:user_name, DEFAULT_USER_NAME))
     git.config('user.email', options.fetch(:user_email, DEFAULT_USER_EMAIL))

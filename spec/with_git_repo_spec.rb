@@ -61,6 +61,69 @@ describe WithGitRepo do
     end
   end
 
+  describe '.with_working_copy' do
+    subject { WithGitRepo.with_working_copy(path, options) }
+
+    let(:path) { nil }
+    let(:working_copy_path) { Dir.mktmpdir('working-copy-') }
+    let(:default_options) { {} }
+
+    around do |test|
+      Dir.chdir(working_copy_path) do
+        Git.clone(test_repo_path, '.', path: working_copy_path)
+        test.call
+      end
+    end
+
+    context 'with the default options' do
+      let(:options) { default_options }
+
+      it 'initialises with the working copy in the current directory' do
+        regexp = Regexp.new(working_copy_path)
+
+        Dir.chdir(working_copy_path) do
+          assert_match regexp, subject.send(:git).dir.path
+        end
+      end
+
+      it 'sets the user.name to the default user name' do
+        name = WithGitRepo::DEFAULT_USER_NAME
+        assert_equal name, subject.send(:git).config['user.name']
+      end
+
+      it 'sets the user.email to the default user email' do
+        email = WithGitRepo::DEFAULT_USER_EMAIL
+        assert_equal email, subject.send(:git).config['user.email']
+      end
+    end
+
+    context 'with the user_name option' do
+      let(:options) { default_options.merge(user_name: 'foo') }
+
+      it 'sets the user.name to the given user name' do
+        assert_equal 'foo', subject.send(:git).config['user.name']
+      end
+    end
+
+    context 'with the user_email option' do
+      let(:options) { default_options.merge(user_email: 'foo@example.com') }
+
+      it 'sets the user.name to the given user name' do
+        assert_equal 'foo@example.com', subject.send(:git).config['user.email']
+      end
+    end
+
+    context 'when given a path' do
+      let(:path) { working_copy_path }
+      let(:options) { default_options }
+
+      it 'initialises with the working copy in the given directory' do
+        regexp = Regexp.new(working_copy_path)
+        assert_match regexp, subject.send(:git).dir.path
+      end
+    end
+  end
+
   describe '#user_name' do
     subject { with_git_repo.user_name }
 
